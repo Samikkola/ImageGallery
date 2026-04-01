@@ -29,6 +29,14 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Swagger",
+        policy => policy
+            .WithOrigins("http://localhost:55683")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -56,6 +64,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("Swagger");
 
 // Staattisten tiedostojen jako — tarjoilee wwwroot-kansion sisällön
 // Tarvitaan paikallisesti tallennettujen kuvien näyttämiseen
