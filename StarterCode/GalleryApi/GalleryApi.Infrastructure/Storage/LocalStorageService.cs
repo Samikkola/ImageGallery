@@ -33,13 +33,36 @@ public class LocalStorageService : IStorageService
     //   2. Tarkista onko tiedosto olemassa: File.Exists(filePath)
     //   3. Poista: File.Delete(filePath)
 
-    public Task<string> UploadAsync(Stream fileStream, string fileName, string contentType, Guid albumId)
+
+    private readonly string _basePath;
+
+    public LocalStorageService(IWebHostEnvironment env, IOptions<StorageOptions> opts)
     {
-        throw new NotImplementedException("LocalStorageService.UploadAsync ei ole vielä toteutettu. Katso TODO-kommentit.");
+        // Yhdistää juuripolun ja konfiguroitun suhteellisen polun
+        // Esim: "C:/projects/GalleryApi/GalleryApi.WebApi" + "wwwroot/uploads"
+        _basePath = Path.Combine(env.ContentRootPath, opts.Value.BasePath);
+    }
+
+    public async Task<string> UploadAsync(Stream fileStream, string fileName, string contentType, Guid albumId)
+    {
+        // Luo albumikohtainen kansio
+        var albumDir = Path.Combine(_basePath, albumId.ToString());
+        Directory.CreateDirectory(albumDir);
+
+        // Kirjoita tiedosto
+        var filePath = Path.Combine(albumDir, fileName);
+        using var output = File.Create(filePath);
+        await fileStream.CopyToAsync(output);
+
+        // Palauta URL — UseStaticFiles() tarjoilee wwwroot/-kansion
+        return $"/uploads/{albumId}/{fileName}";
     }
 
     public Task DeleteAsync(string fileName, Guid albumId)
     {
-        throw new NotImplementedException("LocalStorageService.DeleteAsync ei ole vielä toteutettu. Katso TODO-kommentit.");
+        var filePath = Path.Combine(_basePath, albumId.ToString(), fileName);
+        if (File.Exists(filePath))
+            File.Delete(filePath);
+        return Task.CompletedTask;
     }
 }

@@ -24,9 +24,9 @@ public class ModerationServiceClient
     //   }
     //
     // Muista muuttaa myös _apiKey-kentän tyyppi (tai poista se ja käytä _options.ApiKey suoraan).
-    public ModerationServiceClient(string apiKey)
+    public ModerationServiceClient(IOptions<ModerationServiceOptions> options)
     {
-        _apiKey = apiKey;
+        _apiKey = options.Value.ApiKey;
     }
 
     /// <summary>

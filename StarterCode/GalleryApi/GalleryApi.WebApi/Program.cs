@@ -17,12 +17,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Tehtäväsi Vaiheessa 3 (README-Part1.md): Korvaa tämä User Secrets -ratkaisulla.
 // Tehtäväsi Vaiheessa 4 (README-Part1.md): Korvaa tämä Options Pattern -ratkaisulla.
 // ============================================================
-var moderationClient = new ModerationServiceClient("sk-moderation-hardcoded-dev-12345");
-builder.Services.AddSingleton(moderationClient);
 
 // Konfiguraatio-osiot (Options Pattern)
 builder.Services.Configure<StorageOptions>(
     builder.Configuration.GetSection(StorageOptions.SectionName));
+
+builder.Services.Configure<ModerationServiceOptions>(
+    builder.Configuration.GetSection(ModerationServiceOptions.SectionName));
+
+// ModerationServiceClient saa asetukset DI:n kautta
+builder.Services.AddSingleton<ModerationServiceClient>();
 
 // Sovellus- ja infrastruktuurikerrokset
 builder.Services.AddApplication();
