@@ -3,8 +3,15 @@ using GalleryApi.Infrastructure;
 using GalleryApi.Infrastructure.Moderation;
 using GalleryApi.Infrastructure.Options;
 using GalleryApi.Infrastructure.Persistence;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+//Hakee Azure Key vaultin URL:n ja asettaa sen konfiguraatioon
+var keyVaultUrl = builder.Configuration["KeyVault:VaultUrl"];
+if (!string.IsNullOrEmpty(keyVaultUrl))
+{
+    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUrl), new DefaultAzureCredential());
+}
 
 // ============================================================
 // ONGELMA: API-avain on kovakoodattu suoraan lähdekoodiin!
